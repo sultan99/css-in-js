@@ -7,7 +7,9 @@ const delay = require('delay')
 const data = require('../../webpage/src/data.json')
 
 // https://github.com/settings/tokens
-const access_token = process.env.GITHUB_TOKEN
+const config = {
+  headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` }
+}
 
 async function getPackagesData() {
   return Promise.all(data.rows.map(getPackageData))
@@ -48,13 +50,14 @@ const getNpmDownloads = npm =>
 const getIssueCount = (github, state) =>
   axios
     .get(
-      `https://api.github.com/search/issues?access_token=${access_token}&q=repo:${github}+type:issue+state:${state}`
+      `https://api.github.com/search/issues?q=repo:${github}+type:issue+state:${state}`,
+      config
     )
     .then(response => response.data.total_count)
 
 const getGithubRepoStats = github =>
   axios
-    .get(`https://api.github.com/repos/${github}?access_token=${access_token}`)
+    .get(`https://api.github.com/repos/${github}`, config)
     .then(response => response.data)
 
 async function getGithubStats(github) {
